@@ -1,6 +1,7 @@
 use {
     crate::{constant::*, error::ContractError, state::*, utils::*},
     anchor_lang::prelude::*,
+    std::str::FromStr,
 };
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -10,7 +11,7 @@ pub struct TransferFeesIx {
 
 #[derive(Accounts)]
 #[instruction(ix: TransferFeesIx)]
-pub struct UpdateConfigCtx<'info> {
+pub struct TransferFeesCtx<'info> {
     #[account(
       mut,
       constraint = is_admin(authority.key) @ ContractError::InvalidAuthority
@@ -26,24 +27,41 @@ pub struct UpdateConfigCtx<'info> {
 
     /// CHECK: We read this key only
     pub target_program: UncheckedAccount<'info>,
+
+    pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<UpdateConfigCtx>, ix: CreateConfigIx) -> Result<()> {
-    let config = ctx.accounts.config;
+pub fn handler<'info>(ctx: Context<'_, '_, '_, 'info, TransferFeesCtx<'info>>, _: TransferFeesIx) -> Result<()> {
+    let config = &ctx.accounts.config;
+    
+    let mut fee_wallets = Vec::new();
+    if config.is_using_global_fee_wallets {
+        for i in 0..GLOBAL_FEE_WALLETS.len() {
+            let fee_wallet = FeeWallet {
+                address: Pubkey::from_str(GLOBAL_FEE_WALLETS[i]).unwrap(),
+                fee_percent: GLOBAL_FEE_WALLETS_FEE_PERCENT[i],
+            };
+            fee_wallets.push(fee_wallet);
+        }
+    } else {
+        for i in 0..config.fee_wallets.len() {
+            let fee_wallet = FeeWallet {
+                address: config.fee_wallets[i].address,
+                fee_percent: config.fee_wallets[i].fee_percent,
+            };
+            fee_wallets.push(fee_wallet);
+        }
+    }
 
-    let mut accumalated_percent = 0;
+    let mut accumalated_percent: u64 = 0;
     for (index, account) in ctx.remaining_accounts.iter().enumerate() {
-        let fee_wallet_info = if config.is_using_global_fee_wallets {
-            config.fee_wallets[index]
-        } else {
-            GLOBAL_FEE_WALLETS[index]
-        };
+        let fee_wallet_info = fee_wallets[index].clone();
         
         if fee_wallet_info.address != account.key() {
-            throw!(ContractError::InvalidFeeWallet);
+            return Err(ContractError::InvalidFeeWallet.into());
         }
 
-        let fee_amount = fee_wallet_info.fee_percent.checked_mul(config.fee_amount).unwrap().checked_div(PERCENT_DENOMINATOR).unwrap();
+        let fee_amount = fee_wallet_info.fee_percent.checked_mul(ctx.accounts.config.fee_amount).unwrap().checked_div(PERCENT_DENOMINATOR).unwrap();
 
         anchor_lang::system_program::transfer(
             CpiContext::new(ctx.accounts.system_program.to_account_info(),

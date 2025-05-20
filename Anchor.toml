@@ -2,11 +2,11 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-fee_governance_hub = "4HWpjToHrpBZ59QooTSo3xkuDQpWNkMDWPsZTehhzmhg"
+fee_governance_hub = "B2MAnZ2rRrespfWjFbq6jxp6BFDZ35wPQtMHY4zd3iFD"
 [programs.devnet]
-fee_governance_hub = "H9ipY7meXay7QLC5vniRoyDqL6ZeZeXpDXNVpWuRzbCK"
+fee_governance_hub = "B2MAnZ2rRrespfWjFbq6jxp6BFDZ35wPQtMHY4zd3iFD"
 [programs.mainnet]
-fee_governance_hub = "H9ipY7meXay7QLC5vniRoyDqL6ZeZeXpDXNVpWuRzbCK"
+fee_governance_hub = "B2MAnZ2rRrespfWjFbq6jxp6BFDZ35wPQtMHY4zd3iFD"
 
 [registry]
 url = "https://api.apr.dev"

@@ -32,11 +32,11 @@ pub struct UpdateConfigCtx<'info> {
     pub target_program: UncheckedAccount<'info>,
 }
 
-pub fn handler(ctx: Context<UpdateConfigCtx>, ix: CreateConfigIx) -> Result<()> {
+pub fn handler(ctx: Context<UpdateConfigCtx>, ix: UpdateConfigIx) -> Result<()> {
     let config = &mut ctx.accounts.config;
 
     config.is_using_global_fee_wallets = ix.is_using_global_fee_wallets;
-    config.fee_wallets = ix.fee_wallets;
+    config.fee_wallets = ix.fee_wallets.to_vec();
     config.fee_amount = ix.fee_amount;
     config.fee_instruction_name = ix.fee_instruction_name;
     

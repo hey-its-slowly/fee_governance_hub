@@ -1,3 +1,7 @@
+use anchor_lang::prelude::*;
+use crate::state::FeeWallet;
+use std::str::FromStr;
+
 /// constants for seeds
 pub const CONFIG_TAG:&[u8] = b"CONFIG_TAG";
 
@@ -11,17 +15,14 @@ pub const MAX_FEE_INSTRUCTION_NAME_LEN: usize = 30;
 
 pub const PERCENT_DENOMINATOR: u64 = 1000;
 
-pub const GLOBAL_FEE_WALLETS: [&FeeWallet; 3] = [
-  FeeWallet {
-    address: Pubkey::from_str("ArpaDqpkJpKfxLP7WoFvYMbkj33C1PAHcy8tyrxFpgrc").unwrap(),
-    fee_percent: 1000, // 100%
-  },
-  FeeWallet {
-    address: Pubkey::from_str("11111111111111111111111111111111").unwrap(),
-    fee_percent: 0,
-  },
-  FeeWallet {
-    address: Pubkey::from_str("11111111111111111111111111111111").unwrap(),
-    fee_percent: 0,
-  },
+pub const GLOBAL_FEE_WALLETS: [&str; 3] = [
+  "ArpaDqpkJpKfxLP7WoFvYMbkj33C1PAHcy8tyrxFpgrc",
+  "11111111111111111111111111111111",
+  "11111111111111111111111111111111"
+];
+
+pub const GLOBAL_FEE_WALLETS_FEE_PERCENT: [u64; 3] = [
+  1000,
+  0,
+  0
 ];
