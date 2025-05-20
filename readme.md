@@ -13,6 +13,4 @@ Environment setup and deploy:
 Contract configuration with admin wallet:
 
 1. Change .env.example to .env. Change wallets and network in .env.
-2. Create Default LookupTable account, `npx ts-node ./scripts/lookuptable.ts`. You need to check the comments in that file and change some addresses. After running it successfully, you can find LUT account in Terminal.
-3. Reconfigure the frontend with the new LUT account.
-4. in `programs/fee_governance_hub/src/constant.rs`, change the admin wallet address.
+2. in `programs/fee_governance_hub/src/constant.rs`, change the admin wallet address.
