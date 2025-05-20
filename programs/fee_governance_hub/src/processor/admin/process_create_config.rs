@@ -32,6 +32,8 @@ pub struct CreateConfigCtx<'info> {
 
     /// CHECK: We read this key only
     pub target_program: UncheckedAccount<'info>,
+
+    pub system_program: Program<'info, System>,
 }
 
 pub fn handler(ctx: Context<CreateConfigCtx>, ix: CreateConfigIx) -> Result<()> {
@@ -39,13 +41,13 @@ pub fn handler(ctx: Context<CreateConfigCtx>, ix: CreateConfigIx) -> Result<()> 
 
     config.bump = ctx.bumps.config;
     config.program = ctx.accounts.target_program.key();
-    config.fee_instruction_index = ix.fee_instruction_index;
+    config.fee_instruction_index = ix.fee_instruction_index as u8;
     config.is_using_global_fee_wallets = ix.is_using_global_fee_wallets;
-    config.fee_wallets = ix.fee_wallets;
+    config.fee_wallets = ix.fee_wallets.to_vec();
     config.fee_amount = ix.fee_amount;
     config.fee_instruction_name = ix.fee_instruction_name;
     
-    config.created_at = Clock::get()?.unix_timestamp;
+    config.created_at = Clock::get()?.unix_timestamp as u64;
 
     Ok(())
 }

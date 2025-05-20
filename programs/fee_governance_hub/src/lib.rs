@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("H9ipY7meXay7QLC5vniRoyDqL6ZeZeXpDXNVpWuRzbCK");
+declare_id!("B2MAnZ2rRrespfWjFbq6jxp6BFDZ35wPQtMHY4zd3iFD");
 
 /// constant
 pub mod constant;
@@ -29,7 +29,7 @@ pub mod fee_governance_hub {
     }
     
     // cpi
-    pub fn transfer_fees(ctx: Context<TransferFeesCtx>, ix: TransferFeesIx) -> Result<()> {
+    pub fn transfer_fees<'info>(ctx: Context<'_, '_, '_, 'info, TransferFeesCtx<'info>>, ix: TransferFeesIx) -> Result<()> {
         process_transfer_fees::handler(ctx, ix)
     }
 }

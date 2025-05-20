@@ -1,5 +1,4 @@
 use {
-    crate::error::ContractError,
     anchor_lang::prelude::*
 };
 
