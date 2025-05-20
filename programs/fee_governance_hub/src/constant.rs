@@ -1,7 +1,3 @@
-use anchor_lang::prelude::*;
-use crate::state::FeeWallet;
-use std::str::FromStr;
-
 /// constants for seeds
 pub const CONFIG_TAG:&[u8] = b"CONFIG_TAG";
 
