@@ -1,0 +1,20 @@
+[features]
+seeds = false
+skip-lint = false
+[programs.localnet]
+fee_governance_hub = "4HWpjToHrpBZ59QooTSo3xkuDQpWNkMDWPsZTehhzmhg"
+[programs.devnet]
+fee_governance_hub = "H9ipY7meXay7QLC5vniRoyDqL6ZeZeXpDXNVpWuRzbCK"
+[programs.mainnet]
+fee_governance_hub = "H9ipY7meXay7QLC5vniRoyDqL6ZeZeXpDXNVpWuRzbCK"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "***REMOVED***"
+wallet = "../roundies_devnet.json"
+
+[scripts]
+# test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/test.ts"
