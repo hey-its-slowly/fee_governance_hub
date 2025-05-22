@@ -6,7 +6,7 @@ use {
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct TransferFeesIx {
-    fee_instruction_index: u64,
+    pub fee_instruction_index: u64,
 }
 
 #[derive(Accounts)]
