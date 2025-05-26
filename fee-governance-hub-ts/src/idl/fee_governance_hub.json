@@ -1,0 +1,410 @@
+{
+  "address": "B2MAnZ2rRrespfWjFbq6jxp6BFDZ35wPQtMHY4zd3iFD",
+  "metadata": {
+    "name": "fee_governance_hub",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "create_config",
+      "discriminator": [
+        201,
+        207,
+        243,
+        114,
+        75,
+        111,
+        47,
+        189
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  67,
+                  79,
+                  78,
+                  70,
+                  73,
+                  71,
+                  95,
+                  84,
+                  65,
+                  71
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "target_program"
+              },
+              {
+                "kind": "arg",
+                "path": "ix.fee_instruction_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "target_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "ix",
+          "type": {
+            "defined": {
+              "name": "CreateConfigIx"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "transfer_fees",
+      "discriminator": [
+        103,
+        60,
+        61,
+        79,
+        56,
+        61,
+        76,
+        49
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  67,
+                  79,
+                  78,
+                  70,
+                  73,
+                  71,
+                  95,
+                  84,
+                  65,
+                  71
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "target_program"
+              },
+              {
+                "kind": "arg",
+                "path": "ix.fee_instruction_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "target_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "ix",
+          "type": {
+            "defined": {
+              "name": "TransferFeesIx"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "update_config",
+      "discriminator": [
+        29,
+        158,
+        252,
+        191,
+        10,
+        83,
+        219,
+        99
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  67,
+                  79,
+                  78,
+                  70,
+                  73,
+                  71,
+                  95,
+                  84,
+                  65,
+                  71
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "target_program"
+              },
+              {
+                "kind": "arg",
+                "path": "ix.fee_instruction_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "target_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "ix",
+          "type": {
+            "defined": {
+              "name": "UpdateConfigIx"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Config",
+      "discriminator": [
+        155,
+        12,
+        170,
+        224,
+        30,
+        250,
+        204,
+        130
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidAuthority",
+      "msg": "Invalid Authority."
+    },
+    {
+      "code": 6001,
+      "name": "InvalidInstruction",
+      "msg": "Invalid Instruction."
+    },
+    {
+      "code": 6002,
+      "name": "InvalidFeeWallet",
+      "msg": "Invalid Fee Wallet."
+    },
+    {
+      "code": 6003,
+      "name": "InvalidRemainingAccounts",
+      "msg": "Invalid Remaining Accounts."
+    }
+  ],
+  "types": [
+    {
+      "name": "Config",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "program",
+            "type": "pubkey"
+          },
+          {
+            "name": "fee_instruction_index",
+            "type": "u8"
+          },
+          {
+            "name": "is_using_global_fee_wallets",
+            "type": "bool"
+          },
+          {
+            "name": "fee_amount",
+            "type": "u64"
+          },
+          {
+            "name": "fee_wallets",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "FeeWallet"
+                }
+              }
+            }
+          },
+          {
+            "name": "fee_instruction_name",
+            "type": "string"
+          },
+          {
+            "name": "created_at",
+            "type": "u64"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u128",
+                2
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateConfigIx",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fee_instruction_index",
+            "type": "u64"
+          },
+          {
+            "name": "is_using_global_fee_wallets",
+            "type": "bool"
+          },
+          {
+            "name": "fee_wallets",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "FeeWallet"
+                  }
+                },
+                3
+              ]
+            }
+          },
+          {
+            "name": "fee_amount",
+            "type": "u64"
+          },
+          {
+            "name": "fee_instruction_name",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeeWallet",
+      "repr": {
+        "kind": "c"
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "pubkey"
+          },
+          {
+            "name": "fee_percent",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TransferFeesIx",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fee_instruction_index",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdateConfigIx",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fee_instruction_index",
+            "type": "u64"
+          },
+          {
+            "name": "is_using_global_fee_wallets",
+            "type": "bool"
+          },
+          {
+            "name": "fee_wallets",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "FeeWallet"
+                  }
+                },
+                3
+              ]
+            }
+          },
+          {
+            "name": "fee_amount",
+            "type": "u64"
+          },
+          {
+            "name": "fee_instruction_name",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ]
+}
