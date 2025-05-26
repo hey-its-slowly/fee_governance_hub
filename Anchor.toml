@@ -18,3 +18,4 @@ wallet = "../roundies_devnet.json"
 [scripts]
 # test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/test.ts"
+build = "anchor build && cp target/types/fee_governance_hub.ts fee-governance-hub-ts/src/idl/fee_governance_hub.ts && cp target/idl/fee_governance_hub.json fee-governance-hub-ts/src/idl/fee_governance_hub.json"
