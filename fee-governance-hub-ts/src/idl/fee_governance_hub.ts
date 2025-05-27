@@ -101,7 +101,6 @@ export type FeeGovernanceHub = {
         },
         {
           "name": "config",
-          "writable": true,
           "pda": {
             "seeds": [
               {

@@ -95,7 +95,6 @@
         },
         {
           "name": "config",
-          "writable": true,
           "pda": {
             "seeds": [
               {
