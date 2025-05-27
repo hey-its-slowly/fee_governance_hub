@@ -38,7 +38,15 @@ export class InstructionFeeConfig {
     this.createdAt = createdAt;
   }
 
-  public getRemainingAccounts(): PublicKey[] {
-    return this.feeWallets.map((wallet) => new PublicKey(wallet.address));
+  public getRemainingAccounts(): {
+    pubkey: PublicKey;
+    isWritable: boolean;
+    isSigner: boolean;
+  }[] {
+    return this.feeWallets.map((wallet) => ({
+      pubkey: new PublicKey(wallet.address),
+      isWritable: true,
+      isSigner: false,
+    }));
   }
 }

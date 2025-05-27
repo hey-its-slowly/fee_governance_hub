@@ -2,6 +2,7 @@ import * as anchor from "@coral-xyz/anchor";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { FeeGovernanceHub } from "../idl/fee_governance_hub";
 import * as FeeGovernanceHubIdl from "../idl/fee_governance_hub.json";
+import { PublicKey } from "@solana/web3.js";
 
 // constants for seeds
 export const CONFIG_TAG = Buffer.from("CONFIG_TAG");
@@ -25,3 +26,5 @@ export const getFeeGovernanceHubProgram = (
 
   return program;
 };
+
+export const PROGRAM_ID = new PublicKey(FeeGovernanceHubIdl.address);
