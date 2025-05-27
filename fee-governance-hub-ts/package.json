@@ -1,9 +1,10 @@
 {
   "name": "fee-governance-hub-ts",
-  "version": "1.0.4",
+  "version": "1.0.12",
   "scripts": {
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
-    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
+    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
+    "upgrade-version": "ts-node upgrade-npm-version.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.1",

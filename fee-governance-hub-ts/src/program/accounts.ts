@@ -1,8 +1,12 @@
 import * as anchor from "@coral-xyz/anchor";
-import { MemcmpFilter } from "@solana/web3.js";
+import { MemcmpFilter, SystemProgram } from "@solana/web3.js";
 import { InstructionFeeConfig } from "./types/InstructionFeeConfig";
 import { FeeGovernanceHub } from "../idl/fee_governance_hub";
-import { CONFIG_TAG, getFeeGovernanceHubProgram } from "./constants";
+import {
+  CONFIG_TAG,
+  getFeeGovernanceHubProgram,
+  PERCENT_DENOMINATOR,
+} from "./constants";
 import * as FeeGovernanceHubIdl from "../idl/fee_governance_hub.json";
 
 export const parseInstructionFeeConfig = (
@@ -16,10 +20,16 @@ export const parseInstructionFeeConfig = (
     rawInstructionFeeConfig.program.toString(),
     rawInstructionFeeConfig.feeInstructionIndex,
     rawInstructionFeeConfig.isUsingGlobalFeeWallets,
-    rawInstructionFeeConfig.feeWallets.map((wallet: any) => ({
-      address: wallet.address.toString(),
-      feePercent: wallet.feePercent,
-    })),
+    rawInstructionFeeConfig.feeWallets
+      .filter(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (wallet: any) => wallet.address !== SystemProgram.programId.toBase58()
+      )
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((wallet: any) => ({
+        address: wallet.address.toString(),
+        feePercent: wallet.feePercent.toNumber() / PERCENT_DENOMINATOR,
+      })),
     rawInstructionFeeConfig.feeAmount,
     rawInstructionFeeConfig.feeInstructionName.toString(),
     rawInstructionFeeConfig.createdAt
