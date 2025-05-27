@@ -1,6 +1,6 @@
 {
   "name": "fee-governance-hub-ts",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "scripts": {
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",

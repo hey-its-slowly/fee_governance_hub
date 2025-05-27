@@ -1,3 +1,4 @@
+import { SYSTEM_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/native/system";
 import { PublicKey } from "@solana/web3.js";
 
 export interface FeeWallet {
@@ -43,10 +44,12 @@ export class InstructionFeeConfig {
     isWritable: boolean;
     isSigner: boolean;
   }[] {
-    return this.feeWallets.map((wallet) => ({
-      pubkey: new PublicKey(wallet.address),
-      isWritable: true,
-      isSigner: false,
-    }));
+    return this.feeWallets
+      .filter((wallet) => wallet.address !== SYSTEM_PROGRAM_ID.toBase58())
+      .map((wallet) => ({
+        pubkey: new PublicKey(wallet.address),
+        isWritable: true,
+        isSigner: false,
+      }));
   }
 }

@@ -19,7 +19,6 @@ pub struct TransferFeesCtx<'info> {
     pub authority: Signer<'info>,
 
     #[account(
-        mut,
         seeds = [CONFIG_TAG, target_program.key().as_ref(), &ix.fee_instruction_index.to_le_bytes()],
         bump,
     )]
