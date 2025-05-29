@@ -1,11 +1,12 @@
 import * as anchor from "@coral-xyz/anchor";
 import { FeeGovernanceHub } from "../idl/fee_governance_hub";
-import { FeeWallet } from "./types";
+import { FeeWallet, InstructionFeeConfig } from "./types";
 import {
   MAX_FEE_INSTRUCTION_NAME_LEN,
   MAX_FEE_WALLETS_LEN,
   PERCENT_DENOMINATOR,
 } from "./constants";
+import { SYSTEM_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/native/system";
 
 export const createFeeConfig = async (
   authority: anchor.web3.PublicKey,
@@ -91,4 +92,20 @@ export const updateFeeConfig = async (
     .instruction();
 
   return ix;
+};
+
+export const getRemainingAccountsForFees = (
+  config: InstructionFeeConfig
+): {
+  pubkey: anchor.web3.PublicKey;
+  isWritable: boolean;
+  isSigner: boolean;
+}[] => {
+  return config.feeWallets
+    .filter((wallet) => wallet.address !== SYSTEM_PROGRAM_ID.toBase58())
+    .map((wallet) => ({
+      pubkey: new anchor.web3.PublicKey(wallet.address),
+      isWritable: true,
+      isSigner: false,
+    }));
 };

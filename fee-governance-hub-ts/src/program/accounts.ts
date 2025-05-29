@@ -14,13 +14,13 @@ export const parseInstructionFeeConfig = (
   rawInstructionFeeConfig: any,
   key: anchor.web3.PublicKey
 ): InstructionFeeConfig => {
-  const instructionFeeConfig = new InstructionFeeConfig(
-    key.toString(),
-    rawInstructionFeeConfig.bump,
-    rawInstructionFeeConfig.program.toString(),
-    rawInstructionFeeConfig.feeInstructionIndex,
-    rawInstructionFeeConfig.isUsingGlobalFeeWallets,
-    rawInstructionFeeConfig.feeWallets
+  const instructionFeeConfig = {
+    key: key.toString(),
+    bump: rawInstructionFeeConfig.bump,
+    program: rawInstructionFeeConfig.program.toString(),
+    feeInstructionIndex: rawInstructionFeeConfig.feeInstructionIndex,
+    isUsingGlobalFeeWallets: rawInstructionFeeConfig.isUsingGlobalFeeWallets,
+    feeWallets: rawInstructionFeeConfig.feeWallets
       .filter(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (wallet: any) => wallet.address !== SystemProgram.programId.toBase58()
@@ -30,10 +30,10 @@ export const parseInstructionFeeConfig = (
         address: wallet.address.toString(),
         feePercent: wallet.feePercent.toNumber() / PERCENT_DENOMINATOR,
       })),
-    rawInstructionFeeConfig.feeAmount,
-    rawInstructionFeeConfig.feeInstructionName.toString(),
-    rawInstructionFeeConfig.createdAt
-  );
+    feeAmount: rawInstructionFeeConfig.feeAmount,
+    feeInstructionName: rawInstructionFeeConfig.feeInstructionName.toString(),
+    createdAt: rawInstructionFeeConfig.createdAt,
+  };
 
   return instructionFeeConfig;
 };
