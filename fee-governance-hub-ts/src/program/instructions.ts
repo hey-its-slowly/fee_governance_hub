@@ -2,6 +2,7 @@ import * as anchor from "@coral-xyz/anchor";
 import { FeeGovernanceHub } from "../idl/fee_governance_hub";
 import { FeeWallet, InstructionFeeConfig } from "./types";
 import {
+  GLOBAL_FEE_WALLETS,
   MAX_FEE_INSTRUCTION_NAME_LEN,
   MAX_FEE_WALLETS_LEN,
   PERCENT_DENOMINATOR,
@@ -101,6 +102,14 @@ export const getRemainingAccountsForFees = (
   isWritable: boolean;
   isSigner: boolean;
 }[] => {
+  if (config.isUsingGlobalFeeWallets) {
+    return GLOBAL_FEE_WALLETS.map((wallet) => ({
+      pubkey: new anchor.web3.PublicKey(wallet.address),
+      isWritable: true,
+      isSigner: false,
+    }));
+  }
+
   return config.feeWallets
     .filter((wallet) => wallet.address !== SYSTEM_PROGRAM_ID.toBase58())
     .map((wallet) => ({
