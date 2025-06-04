@@ -33,13 +33,13 @@ pub const ADMINS: [&str; 1] = [
 #[cfg(feature = "devnet")]
 pub const GLOBAL_FEE_WALLETS: [&str; 3] = [
   "ArpaDqpkJpKfxLP7WoFvYMbkj33C1PAHcy8tyrxFpgrc",
-  "11111111111111111111111111111111",
+  "F1tyGduCd9XLBSw2uAFycdNRUucyr2C7MiJ1Nifm2rZ8",
   "11111111111111111111111111111111"
 ];
 
 #[cfg(feature = "devnet")]
 pub const GLOBAL_FEE_WALLETS_FEE_PERCENT: [u64; 3] = [
-  1000,
-  0,
+  500,
+  500,
   0
 ];
