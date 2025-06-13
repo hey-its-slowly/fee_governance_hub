@@ -23,3 +23,8 @@ For example, we need 2 fee configs for spl_fishing program: `create_game`(origin
 1. Change the parameters in `scripts/createFeeConfig.ts`. `feeInstructionIndex` is the constant(Number type) of the instruction declared in the consuming program.
 
 2. Run `ts-node scripts/createFeeConfig.ts`
+
+## Building and Deploy programs
+
+1. `anchor build --program-name nft_auction`
+2. `anchor deploy --program-name nft_auction`

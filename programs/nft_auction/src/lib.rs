@@ -11,7 +11,7 @@ pub mod error;
 
 use account::*;
 use error::*;
-declare_id!("AGopdUYkfyWMehbcvjC1kA2e44hq5kDqTEkVPLckBPrV");
+declare_id!("DPfxKCBy8xy6mCKNd6Fixfoc5Dx9nm8NVQf7NHDoTEcz");
 
 #[program]
 pub mod nft_auction {
@@ -25,6 +25,8 @@ pub mod nft_auction {
         destination: Option<Pubkey>,
         burn_proceeds: bool,
         tag: u64,
+        tick_option: u8,
+        tick_amount: u64,
     ) -> Result<()> {
         let auction = &mut ctx.accounts.auction;
         
@@ -32,6 +34,7 @@ pub mod nft_auction {
         let clock = Clock::get()?;
         require!(start_time > clock.unix_timestamp, AuctionCode::InvalidStartTime);
         require!(end_time > start_time, AuctionCode::InvalidEndTime);
+        require!(tick_option == account::TICK_OPTION_PERCENTAGE || tick_option == account::TICK_OPTION_FLAT, AuctionCode::InvalidTickOption);
         
         // Initialize auction
         auction.creator = ctx.accounts.creator.key();
@@ -50,6 +53,8 @@ pub mod nft_auction {
         auction.num_bids = 0;
         auction.collection = ctx.accounts.collection.as_ref().map(|account_info| account_info.key()).unwrap_or_default();
         auction.bump = ctx.bumps.auction;
+        auction.tick_option = tick_option;
+        auction.tick_amount = tick_amount;
 
         // Transfer NFT to vault
         let transfer_ctx = CpiContext::new(
@@ -81,6 +86,8 @@ pub mod nft_auction {
         destination: Option<Pubkey>,
         burn_proceeds: bool,
         tag: u64,
+        tick_option: u8,
+        tick_amount: u64,
     ) -> Result<()> {
         let auction = &mut ctx.accounts.auction;
         
@@ -88,6 +95,7 @@ pub mod nft_auction {
         let clock = Clock::get()?;
         require!(start_time > clock.unix_timestamp, AuctionCode::InvalidStartTime);
         require!(end_time > start_time, AuctionCode::InvalidEndTime);
+        require!(tick_option == account::TICK_OPTION_PERCENTAGE || tick_option == account::TICK_OPTION_FLAT, AuctionCode::InvalidTickOption);
         
         // Initialize auction
         auction.creator = ctx.accounts.creator.key();
@@ -106,6 +114,8 @@ pub mod nft_auction {
         auction.num_bids = 0;
         auction.collection = ctx.accounts.collection.as_ref().map(|account_info| account_info.key()).unwrap_or_default();
         auction.bump = ctx.bumps.auction;
+        auction.tick_option = tick_option;
+        auction.tick_amount = tick_amount;
 
         // Transfer NFT to vault
         let mut transfer_builder = TransferV1Builder::new();
@@ -188,7 +198,13 @@ pub mod nft_auction {
         let minimum_bid = if ctx.accounts.auction.current_bid == 0 {
             ctx.accounts.auction.start_price
         } else {
-            ctx.accounts.auction.current_bid + (ctx.accounts.auction.current_bid / 100) // 1% increment
+            if ctx.accounts.auction.tick_option == account::TICK_OPTION_PERCENTAGE {
+                ctx.accounts.auction.current_bid + (ctx.accounts.auction.current_bid / 100) * ctx.accounts.auction.tick_amount
+            } else if ctx.accounts.auction.tick_option == account::TICK_OPTION_FLAT {
+                ctx.accounts.auction.current_bid + ctx.accounts.auction.tick_amount
+            } else {
+                ctx.accounts.auction.current_bid + (ctx.accounts.auction.current_bid / 100)
+            }
         };
         require!(bid_amount >= minimum_bid, AuctionCode::BidTooLow);
 
@@ -276,7 +292,13 @@ pub mod nft_auction {
         let minimum_bid = if ctx.accounts.auction.current_bid == 0 {
             ctx.accounts.auction.start_price
         } else {
-            ctx.accounts.auction.current_bid + (ctx.accounts.auction.current_bid / 100) // 1% increment
+            if ctx.accounts.auction.tick_option == account::TICK_OPTION_PERCENTAGE {
+                ctx.accounts.auction.current_bid + (ctx.accounts.auction.current_bid / 100) * ctx.accounts.auction.tick_amount
+            } else if ctx.accounts.auction.tick_option == account::TICK_OPTION_FLAT {
+                ctx.accounts.auction.current_bid + ctx.accounts.auction.tick_amount
+            } else {
+                ctx.accounts.auction.current_bid + (ctx.accounts.auction.current_bid / 100)
+            }
         };
         require!(bid_amount >= minimum_bid, AuctionCode::BidTooLow);
 
@@ -309,9 +331,9 @@ pub mod nft_auction {
 
         // Transfer new bid amount to vault
         let cpi_accounts = TransferChecked {
-        from: ctx.accounts.bidder_token_account.to_account_info().clone(),
+            from: ctx.accounts.bidder_token_account.to_account_info().clone(),
             mint: ctx.accounts.accepted_mint.to_account_info().clone(),
-        to: ctx.accounts.vault_token_account.to_account_info().clone(),
+            to: ctx.accounts.vault_token_account.to_account_info().clone(),
             authority: ctx.accounts.bidder.to_account_info(),
         };
         let cpi_program = ctx.accounts.token_program.to_account_info();
