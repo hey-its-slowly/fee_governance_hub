@@ -1356,7 +1356,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "nft-auction"
+name = "nft_auction"
 version = "0.1.0"
 dependencies = [
  "anchor-lang",

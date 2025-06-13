@@ -35,4 +35,6 @@ pub enum AuctionCode {
     InvalidPreviousBidder,
     #[msg("Invalid mint")]
     InvalidMint,
+    #[msg("Invalid tick option")]
+    InvalidTickOption,
 }

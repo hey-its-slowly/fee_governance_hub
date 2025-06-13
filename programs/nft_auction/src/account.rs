@@ -18,6 +18,8 @@ pub struct Auction {
     pub prize_type: u8,                 // Prize type for future use - 1: NFT, 2: CORE
     pub num_bids: u64,                 // Number of bids
     pub collection: Pubkey,    // Collection of the NFT
+    pub tick_option: u8,               // Tick option
+    pub tick_amount: u64,              // Tick amount
     pub bump: u8,                      // PDA bump
     pub reserved: [u128; 5],          // Reserved space for future use
 }
@@ -40,6 +42,8 @@ pub struct Creator {
 }
 
 pub const SUPER_ADMIN: &str = "HyQpApazdwCD6DhSWJtymqvWz9c4nNiuemRG4Z1U5vbj";
+pub const TICK_OPTION_PERCENTAGE: u8 = 1;
+pub const TICK_OPTION_FLAT: u8 = 2;
 
 pub fn is_super_admin(key: &Pubkey) -> bool {
     let key_from_str = Pubkey::from_str(SUPER_ADMIN);
