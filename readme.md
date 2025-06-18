@@ -24,7 +24,10 @@ For example, we need 2 fee configs for spl_fishing program: `create_game`(origin
 
 2. Run `ts-node scripts/createFeeConfig.ts`
 
-## Building and Deploy programs
+## Setup nft_auction program
 
 1. `anchor build --program-name nft_auction`
+
 2. `anchor deploy --program-name nft_auction`
+
+3. Create Creator(admin) account using super_admin wallet. There is a super-admin page in [woooo.fun-dev repo](https://github.com/hey-its-slowly/woooo.fun-dev/blob/develop/src/app/admin/super-admin/page.tsx)
