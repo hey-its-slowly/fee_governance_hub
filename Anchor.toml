@@ -16,7 +16,7 @@ nft_auction = "ELB6ThUhWBUn3HJbtooTYasGT1qW7WXeDm9mSh6KrMVA"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = ["", ""]
+cluster = "https://devnet.helius-rpc.com/?api-key=bb956f7e-055d-40e0-9f31-d3e79526eaf8"
 wallet = "../roundies_devnet.json"
 
 [scripts]
