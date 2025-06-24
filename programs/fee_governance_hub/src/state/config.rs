@@ -3,14 +3,14 @@ use {
 };
 
 #[repr(C)]
-#[derive(Clone, AnchorSerialize, AnchorDeserialize, PartialEq, Debug)]
+#[derive(Clone, AnchorSerialize, AnchorDeserialize, PartialEq, Debug, Default)]
 pub struct FeeWallet {
     pub address: Pubkey,
     pub fee_percent: u64,
 }
 
 #[account]
-#[derive(Default)]
+#[derive(Default, PartialEq, Debug)]
 pub struct Config {
     pub bump: u8,
     pub program: Pubkey,

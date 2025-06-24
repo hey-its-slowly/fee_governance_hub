@@ -11,7 +11,7 @@ pub mod error;
 
 use account::*;
 use error::*;
-declare_id!("DPfxKCBy8xy6mCKNd6Fixfoc5Dx9nm8NVQf7NHDoTEcz");
+declare_id!("Ayysp1Ub8cG8QwuZwE4h59L1fCFaRGyAyd5HjX5XDcH5");
 
 #[program]
 pub mod nft_auction {
