@@ -16,8 +16,8 @@ nft_auction = "ELB6ThUhWBUn3HJbtooTYasGT1qW7WXeDm9mSh6KrMVA"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "***REMOVED***"
-wallet = "../roundies_devnet.json"
+cluster = "https://devnet.helius-rpc.com/?api-key=YOUR_API_KEY_HERE"
+wallet = "YOUR_WALLET_HERE"
 
 [scripts]
 build = "anchor build && cp target/types/fee_governance_hub.ts fee-governance-hub-ts/src/idl/fee_governance_hub.ts && cp target/idl/fee_governance_hub.json fee-governance-hub-ts/src/idl/fee_governance_hub.json"
