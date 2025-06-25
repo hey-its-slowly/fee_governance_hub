@@ -639,7 +639,7 @@ pub mod nft_auction {
         if auction.current_bid > 0 {
             if auction.is_native_accepted_mint() {
                 **ctx.accounts.auction.to_account_info().try_borrow_mut_lamports()? -= ctx.accounts.auction.current_bid;
-                **ctx.accounts.claimer.to_account_info().try_borrow_mut_lamports()? += ctx.accounts.auction.current_bid;
+                **ctx.accounts.destination.to_account_info().try_borrow_mut_lamports()? += ctx.accounts.auction.current_bid;
             } else {
                 if !auction.burn_proceeds {
                     let proceeds_transfer_ctx = CpiContext::new_with_signer(
@@ -1167,6 +1167,12 @@ pub struct ClaimNftV2<'info> {
         mut,
     )]
     pub claimer: UncheckedAccount<'info>,
+
+    /// CHECK: we read this key only
+    #[account(
+        mut,
+    )]
+    pub destination: UncheckedAccount<'info>,
 
     #[account(
         mut,
