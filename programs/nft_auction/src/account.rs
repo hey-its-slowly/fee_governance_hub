@@ -36,6 +36,9 @@ pub struct BidderInfo {
 pub struct Creator {
     pub bump: u8,
     pub wallet: Pubkey,
+    pub fee_type: u8,
+    pub fee_amount: u64,
+    pub fee_wallet: Pubkey,
 
     pub created_at: u64,
     pub reserved: [u128; 1],
@@ -44,6 +47,10 @@ pub struct Creator {
 pub const SUPER_ADMIN: &str = "HyQpApazdwCD6DhSWJtymqvWz9c4nNiuemRG4Z1U5vbj";
 pub const TICK_OPTION_PERCENTAGE: u8 = 1;
 pub const TICK_OPTION_FLAT: u8 = 2;
+
+pub const FEE_OPTION_NONE: u8 = 0;
+pub const FEE_OPTION_PERCENTAGE: u8 = 1;
+pub const FEE_OPTION_FLAT: u8 = 2;
 
 pub fn is_super_admin(key: &Pubkey) -> bool {
     let key_from_str = Pubkey::from_str(SUPER_ADMIN);

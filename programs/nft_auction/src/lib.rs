@@ -8,10 +8,13 @@ use anchor_spl::associated_token::{AssociatedToken, create_idempotent};
 
 pub mod account;
 pub mod error;
+pub mod utils;
 
 use account::*;
 use error::*;
-declare_id!("Ayysp1Ub8cG8QwuZwE4h59L1fCFaRGyAyd5HjX5XDcH5");
+use utils::*;
+
+declare_id!("HV9Ti5YZCHs4fd3BMUuT1TW7U2RgrrBmu6PmMGpRx5RD");
 
 #[program]
 pub mod nft_auction {
@@ -351,6 +354,7 @@ pub mod nft_auction {
 
     pub fn claim_nft(ctx: Context<ClaimNft>) -> Result<()> {
         let auction = &ctx.accounts.auction;
+        let creator_account = &ctx.accounts.creator_account;
 
         if !auction.is_native_accepted_mint() {
             // Verify destination token account
@@ -404,9 +408,15 @@ pub mod nft_auction {
     
         // If there were bids and we're not burning proceeds, transfer them to destination
         if auction.current_bid > 0 {
+            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid);
+            let proceeds = auction.current_bid - fee;
+
             if auction.is_native_accepted_mint() {
                 **ctx.accounts.auction.to_account_info().try_borrow_mut_lamports()? -= ctx.accounts.auction.current_bid;
-                **ctx.accounts.destination.to_account_info().try_borrow_mut_lamports()? += ctx.accounts.auction.current_bid;
+                **ctx.accounts.destination.to_account_info().try_borrow_mut_lamports()? += proceeds;
+                if fee > 0 {
+                    **ctx.accounts.creator.to_account_info().try_borrow_mut_lamports()? += fee;
+                }
             } else {
                 if !auction.burn_proceeds {
                     let proceeds_transfer_ctx = CpiContext::new_with_signer(
@@ -418,7 +428,31 @@ pub mod nft_auction {
                         },
                         signer,
                     );
-                    anchor_spl::token::transfer(proceeds_transfer_ctx, ctx.accounts.auction.current_bid)?;
+                    anchor_spl::token::transfer(proceeds_transfer_ctx, proceeds)?;
+
+                    if fee > 0 {
+                        // Verify destination token account
+                        require!(
+                            ctx.accounts.fee_token_account.as_ref().unwrap().mint == ctx.accounts.accepted_mint.key(),
+                            AuctionCode::InvalidDestinationMint
+                        );
+
+                        require!(
+                            ctx.accounts.fee_token_account.as_ref().unwrap().owner == ctx.accounts.fee_wallet.key(),
+                            AuctionCode::InvalidFeeWallet
+                        );
+                        
+                        let fee_transfer_ctx = CpiContext::new_with_signer(
+                            ctx.accounts.token_program.to_account_info(),
+                            Transfer {
+                                from: ctx.accounts.vault_token_account.as_ref().unwrap().to_account_info(),
+                                to: ctx.accounts.fee_token_account.as_ref().unwrap().to_account_info(),
+                                authority: ctx.accounts.auction.to_account_info(),
+                            },
+                            signer,
+                        );
+                        anchor_spl::token::transfer(fee_transfer_ctx, fee)?;
+                    }
                 } else {
                     let burn_ctx = CpiContext::new_with_signer(
                         ctx.accounts.token_program.to_account_info(),
@@ -467,6 +501,7 @@ pub mod nft_auction {
 
     pub fn claim_nft_2022(ctx: Context<ClaimNft2022>) -> Result<()> {
         let auction = &ctx.accounts.auction;
+        let creator_account = &ctx.accounts.creator_account;
 
         // Verify destination token account
         require!(
@@ -517,6 +552,9 @@ pub mod nft_auction {
     
         // If there were bids and we're not burning proceeds, transfer them to destination
         if auction.current_bid > 0 {
+            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid);
+            let proceeds = auction.current_bid - fee;
+
             if !auction.burn_proceeds {
                 let cpi_accounts = TransferChecked {
                     from: ctx.accounts.vault_token_account.to_account_info().clone(),
@@ -526,7 +564,30 @@ pub mod nft_auction {
                 };
                 let cpi_program = ctx.accounts.token_2022_program.to_account_info();
                 let cpi_context = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
-                token_interface::transfer_checked(cpi_context, ctx.accounts.vault_token_account.amount, ctx.accounts.accepted_mint.decimals)?;
+                token_interface::transfer_checked(cpi_context, proceeds, ctx.accounts.accepted_mint.decimals)?;
+
+                if fee > 0 {
+                    // Verify fee token account
+                    require!(
+                        ctx.accounts.fee_token_account.as_ref().unwrap().owner == ctx.accounts.fee_wallet.key(),
+                        AuctionCode::InvalidFeeWallet
+                    );
+                    require!(
+                        ctx.accounts.fee_token_account.as_ref().unwrap().mint == ctx.accounts.accepted_mint.key(),
+                        AuctionCode::InvalidDestinationMint
+                    );
+                    
+                    let cpi_accounts = TransferChecked {
+                        from: ctx.accounts.vault_token_account.to_account_info().clone(),
+                        mint: ctx.accounts.accepted_mint.to_account_info().clone(),
+                        to: ctx.accounts.fee_token_account.as_ref().unwrap().to_account_info().clone(),
+                        authority: ctx.accounts.auction.to_account_info(),
+                    };
+                    let cpi_program = ctx.accounts.token_2022_program.to_account_info();
+                    let cpi_context = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
+                    token_interface::transfer_checked(cpi_context, fee, ctx.accounts.accepted_mint.decimals)?;
+                }
+                
             } else {
                 let cpi_accounts = Burn2022 {
                     mint: ctx.accounts.accepted_mint.to_account_info().clone(),
@@ -574,6 +635,7 @@ pub mod nft_auction {
 
     pub fn claim_nft_v2(ctx: Context<ClaimNftV2>) -> Result<()> {
         let auction = &ctx.accounts.auction;
+        let creator_account = &ctx.accounts.creator_account;
 
         if !auction.is_native_accepted_mint() {
             // Verify destination token account
@@ -637,9 +699,15 @@ pub mod nft_auction {
     
         // If there were bids and we're not burning proceeds, transfer them to destination
         if auction.current_bid > 0 {
+            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid);
+            let proceeds = auction.current_bid - fee;
+
             if auction.is_native_accepted_mint() {
                 **ctx.accounts.auction.to_account_info().try_borrow_mut_lamports()? -= ctx.accounts.auction.current_bid;
-                **ctx.accounts.destination.to_account_info().try_borrow_mut_lamports()? += ctx.accounts.auction.current_bid;
+                **ctx.accounts.destination.to_account_info().try_borrow_mut_lamports()? += proceeds;
+                if fee > 0 {
+                    **ctx.accounts.creator.to_account_info().try_borrow_mut_lamports()? += fee;
+                }
             } else {
                 if !auction.burn_proceeds {
                     let proceeds_transfer_ctx = CpiContext::new_with_signer(
@@ -651,7 +719,31 @@ pub mod nft_auction {
                         },
                         signer,
                     );
-                    anchor_spl::token::transfer(proceeds_transfer_ctx, ctx.accounts.auction.current_bid)?;
+                    anchor_spl::token::transfer(proceeds_transfer_ctx, proceeds)?;
+
+                    if fee > 0 {
+                        // Verify destination token account
+                        require!(
+                            ctx.accounts.fee_token_account.as_ref().unwrap().mint == ctx.accounts.accepted_mint.key(),
+                            AuctionCode::InvalidDestinationMint
+                        );
+
+                        require!(
+                            ctx.accounts.fee_token_account.as_ref().unwrap().owner == ctx.accounts.fee_wallet.key(),
+                            AuctionCode::InvalidFeeWallet
+                        );
+                        
+                        let fee_transfer_ctx = CpiContext::new_with_signer(
+                            ctx.accounts.token_program.to_account_info(),
+                            Transfer {
+                                from: ctx.accounts.vault_token_account.as_ref().unwrap().to_account_info(),
+                                to: ctx.accounts.fee_token_account.as_ref().unwrap().to_account_info(),
+                                authority: ctx.accounts.auction.to_account_info(),
+                            },
+                            signer,
+                        );
+                        anchor_spl::token::transfer(fee_transfer_ctx, fee)?;
+                    }
                 } else {
                     let burn_ctx = CpiContext::new_with_signer(
                         ctx.accounts.token_program.to_account_info(),
@@ -688,6 +780,7 @@ pub mod nft_auction {
 
     pub fn claim_nft_v2_2022(ctx: Context<ClaimNftV22022>) -> Result<()> {
         let auction = &ctx.accounts.auction;
+        let creator_account = &ctx.accounts.creator_account;
 
         // Verify destination token account
         require!(
@@ -748,6 +841,9 @@ pub mod nft_auction {
     
         // If there were bids and we're not burning proceeds, transfer them to destination
         if auction.current_bid > 0 {
+            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid);
+            let proceeds = auction.current_bid - fee;
+
             if !auction.burn_proceeds {
                 let cpi_accounts = TransferChecked {
                     from: ctx.accounts.vault_token_account.to_account_info().clone(),
@@ -757,7 +853,30 @@ pub mod nft_auction {
                 };
                 let cpi_program = ctx.accounts.token_2022_program.to_account_info();
                 let cpi_context = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
-                token_interface::transfer_checked(cpi_context, ctx.accounts.vault_token_account.amount, ctx.accounts.accepted_mint.decimals)?;
+                token_interface::transfer_checked(cpi_context, proceeds, ctx.accounts.accepted_mint.decimals)?;
+
+                if fee > 0 {
+                    // Verify fee token account
+                    require!(
+                        ctx.accounts.fee_token_account.as_ref().unwrap().owner == ctx.accounts.fee_wallet.key(),
+                        AuctionCode::InvalidFeeWallet
+                    );
+                    require!(
+                        ctx.accounts.fee_token_account.as_ref().unwrap().mint == ctx.accounts.accepted_mint.key(),
+                        AuctionCode::InvalidDestinationMint
+                    );
+                    
+                    let cpi_accounts = TransferChecked {
+                        from: ctx.accounts.vault_token_account.to_account_info().clone(),
+                        mint: ctx.accounts.accepted_mint.to_account_info().clone(),
+                        to: ctx.accounts.fee_token_account.as_ref().unwrap().to_account_info().clone(),
+                        authority: ctx.accounts.auction.to_account_info(),
+                    };
+                    let cpi_program = ctx.accounts.token_2022_program.to_account_info();
+                    let cpi_context = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
+                    token_interface::transfer_checked(cpi_context, fee, ctx.accounts.accepted_mint.decimals)?;
+                }
+                
             } else {
                 let cpi_accounts = Burn2022 {
                     mint: ctx.accounts.accepted_mint.to_account_info().clone(),
@@ -995,10 +1114,13 @@ pub mod nft_auction {
         Ok(())
     }
 
-    pub fn add_creator(ctx: Context<AddCreator>) -> Result<()> {
+    pub fn add_creator(ctx: Context<AddCreator>, fee_type: u8, fee_amount: u64) -> Result<()> {
         ctx.accounts.creator.bump = ctx.bumps.creator;
         ctx.accounts.creator.wallet = ctx.accounts.creator_wallet.key();
         ctx.accounts.creator.created_at = Clock::get()?.unix_timestamp as u64;
+        ctx.accounts.creator.fee_type = fee_type;
+        ctx.accounts.creator.fee_amount = fee_amount;
+        ctx.accounts.creator.fee_wallet = ctx.accounts.fee_wallet.key();
 
         Ok(())
     }
@@ -1040,7 +1162,7 @@ pub struct ClaimNft<'info> {
     #[account(
         mut,
     )] 
-    pub creator: UncheckedAccount<'info>,
+    pub creator: UncheckedAccount<'info>, 
 
     /// CHECK: we read this key only
     #[account(
@@ -1073,6 +1195,24 @@ pub struct ClaimNft<'info> {
         mut        
     )]
     pub destination_token_account: Option<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut        
+    )]
+    pub fee_token_account: Option<Account<'info, TokenAccount>>,
+
+    #[account(
+      seeds = [b"creator", creator.key().as_ref()],
+      bump,
+      constraint = creator_account.fee_wallet == fee_wallet.key() @ AuctionCode::InvalidFeeWallet,
+    )]
+    pub creator_account: Box<Account<'info, Creator>>,
+
+    /// CHECK: we read this key only
+    #[account(
+        mut,
+    )] 
+    pub fee_wallet: UncheckedAccount<'info>,   
 
     #[account(
         mut        
@@ -1146,6 +1286,24 @@ pub struct ClaimNft2022<'info> {
     #[account(
         mut        
     )]
+    pub fee_token_account: Option<Box<InterfaceAccount<'info, Token2022TokenAccount>>>,
+
+    #[account(
+      seeds = [b"creator", creator.key().as_ref()],
+      bump,
+      constraint = creator_account.fee_wallet == fee_wallet.key() @ AuctionCode::InvalidFeeWallet,
+    )]
+    pub creator_account: Box<Account<'info, Creator>>,
+
+    /// CHECK: we read this key only
+    #[account(
+        mut,
+    )] 
+    pub fee_wallet: UncheckedAccount<'info>,   
+
+    #[account(
+        mut        
+    )]
     pub accepted_mint: Box<InterfaceAccount<'info, Token2022Mint>>,
 
     pub system_program: Program<'info, System>,
@@ -1209,6 +1367,24 @@ pub struct ClaimNftV2<'info> {
         mut        
     )]
     pub destination_token_account: Option<Account<'info, TokenAccount>>,
+
+    #[account(
+        mut        
+    )]
+    pub fee_token_account: Option<Account<'info, TokenAccount>>,
+
+    #[account(
+      seeds = [b"creator", creator.key().as_ref()],
+      bump,
+      constraint = creator_account.fee_wallet == fee_wallet.key() @ AuctionCode::InvalidFeeWallet,
+    )]
+    pub creator_account: Box<Account<'info, Creator>>,
+
+    /// CHECK: we read this key only
+    #[account(
+        mut,
+    )] 
+    pub fee_wallet: UncheckedAccount<'info>,   
 
     #[account(
         mut        
@@ -1279,6 +1455,24 @@ pub struct ClaimNftV22022<'info> {
         mut        
     )]
     pub destination_token_account: Box<InterfaceAccount<'info, Token2022TokenAccount>>,
+
+    #[account(
+        mut        
+    )]
+    pub fee_token_account: Option<Box<InterfaceAccount<'info, Token2022TokenAccount>>>,
+
+    #[account(
+      seeds = [b"creator", creator.key().as_ref()],
+      bump,
+      constraint = creator_account.fee_wallet == fee_wallet.key() @ AuctionCode::InvalidFeeWallet,
+    )]
+    pub creator_account: Box<Account<'info, Creator>>,
+
+    /// CHECK: we read this key only
+    #[account(
+        mut,
+    )] 
+    pub fee_wallet: UncheckedAccount<'info>,   
 
     #[account(
         mut        
@@ -1726,6 +1920,9 @@ pub struct AddCreator<'info> {
 
   /// CHECK: Not dangerous because only admin can send tx
   pub creator_wallet: UncheckedAccount<'info>,
+
+  /// CHECK: Not dangerous because only admin can send tx
+  pub fee_wallet: UncheckedAccount<'info>,
 
   pub system_program: Program<'info, System>,
 }

@@ -39,4 +39,6 @@ pub enum AuctionCode {
     InvalidTickOption,
     #[msg("Invalid destination")]
     InvalidDestination,
+    #[msg("Invalid fee wallet")]
+    InvalidFeeWallet,
 }
