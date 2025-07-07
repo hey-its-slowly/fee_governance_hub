@@ -415,7 +415,7 @@ pub mod nft_auction {
                 **ctx.accounts.auction.to_account_info().try_borrow_mut_lamports()? -= ctx.accounts.auction.current_bid;
                 **ctx.accounts.destination.to_account_info().try_borrow_mut_lamports()? += proceeds;
                 if fee > 0 {
-                    **ctx.accounts.creator.to_account_info().try_borrow_mut_lamports()? += fee;
+                    **ctx.accounts.fee_wallet.to_account_info().try_borrow_mut_lamports()? += fee;
                 }
             } else {
                 if !auction.burn_proceeds {
@@ -706,7 +706,7 @@ pub mod nft_auction {
                 **ctx.accounts.auction.to_account_info().try_borrow_mut_lamports()? -= ctx.accounts.auction.current_bid;
                 **ctx.accounts.destination.to_account_info().try_borrow_mut_lamports()? += proceeds;
                 if fee > 0 {
-                    **ctx.accounts.creator.to_account_info().try_borrow_mut_lamports()? += fee;
+                    **ctx.accounts.fee_wallet.to_account_info().try_borrow_mut_lamports()? += fee;
                 }
             } else {
                 if !auction.burn_proceeds {
