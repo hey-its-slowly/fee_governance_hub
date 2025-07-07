@@ -44,7 +44,7 @@ pub struct Creator {
     pub reserved: [u128; 1],
 }
 
-pub const SUPER_ADMIN: &str = "F1tyGduCd9XLBSw2uAFycdNRUucyr2C7MiJ1Nifm2rZ8";
+pub const SUPER_ADMIN: &str = "HyQpApazdwCD6DhSWJtymqvWz9c4nNiuemRG4Z1U5vbj";
 pub const TICK_OPTION_PERCENTAGE: u8 = 1;
 pub const TICK_OPTION_FLAT: u8 = 2;
 
