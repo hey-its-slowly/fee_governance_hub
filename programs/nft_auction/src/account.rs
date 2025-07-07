@@ -51,6 +51,7 @@ pub const TICK_OPTION_FLAT: u8 = 2;
 pub const FEE_OPTION_NONE: u8 = 0;
 pub const FEE_OPTION_PERCENTAGE: u8 = 1;
 pub const FEE_OPTION_FLAT: u8 = 2;
+pub const FEE_DENOMINATOR: u64 = 1_000_000_000;
 
 pub fn is_super_admin(key: &Pubkey) -> bool {
     let key_from_str = Pubkey::from_str(SUPER_ADMIN);

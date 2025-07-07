@@ -408,7 +408,7 @@ pub mod nft_auction {
     
         // If there were bids and we're not burning proceeds, transfer them to destination
         if auction.current_bid > 0 {
-            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid);
+            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid, ctx.accounts.accepted_mint.decimals);
             let proceeds = auction.current_bid - fee;
 
             if auction.is_native_accepted_mint() {
@@ -552,7 +552,7 @@ pub mod nft_auction {
     
         // If there were bids and we're not burning proceeds, transfer them to destination
         if auction.current_bid > 0 {
-            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid);
+            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid, ctx.accounts.accepted_mint.decimals);
             let proceeds = auction.current_bid - fee;
 
             if !auction.burn_proceeds {
@@ -699,7 +699,7 @@ pub mod nft_auction {
     
         // If there were bids and we're not burning proceeds, transfer them to destination
         if auction.current_bid > 0 {
-            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid);
+            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid, ctx.accounts.accepted_mint.decimals);
             let proceeds = auction.current_bid - fee;
 
             if auction.is_native_accepted_mint() {
@@ -841,7 +841,7 @@ pub mod nft_auction {
     
         // If there were bids and we're not burning proceeds, transfer them to destination
         if auction.current_bid > 0 {
-            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid);
+            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid, ctx.accounts.accepted_mint.decimals);
             let proceeds = auction.current_bid - fee;
 
             if !auction.burn_proceeds {
