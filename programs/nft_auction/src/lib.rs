@@ -552,8 +552,9 @@ pub mod nft_auction {
     
         // If there were bids and we're not burning proceeds, transfer them to destination
         if auction.current_bid > 0 {
-            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid, ctx.accounts.accepted_mint.decimals);
-            let proceeds = auction.current_bid - fee;
+            let current_bid_balance = ctx.accounts.vault_token_account.amount;
+            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, current_bid_balance, ctx.accounts.accepted_mint.decimals);
+            let proceeds = current_bid_balance - fee;
 
             if !auction.burn_proceeds {
                 let cpi_accounts = TransferChecked {
@@ -841,8 +842,9 @@ pub mod nft_auction {
     
         // If there were bids and we're not burning proceeds, transfer them to destination
         if auction.current_bid > 0 {
-            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, auction.current_bid, ctx.accounts.accepted_mint.decimals);
-            let proceeds = auction.current_bid - fee;
+            let current_bid_balance = ctx.accounts.vault_token_account.amount;
+            let fee = calculate_fee(creator_account.fee_type, creator_account.fee_amount, current_bid_balance, ctx.accounts.accepted_mint.decimals);
+            let proceeds = current_bid_balance - fee;
 
             if !auction.burn_proceeds {
                 let cpi_accounts = TransferChecked {
