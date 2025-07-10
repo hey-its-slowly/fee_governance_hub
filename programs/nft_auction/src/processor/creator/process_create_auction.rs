@@ -26,7 +26,6 @@ pub struct CreateAuction<'info> {
     pub auction: Account<'info, Auction>,
 
     /// The collection to which the asset belongs.
-    /// CHECK: Checked in mpl-core.
     #[account(mut)]
     pub collection: Option<AccountInfo<'info>>,
 

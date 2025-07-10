@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("HV9Ti5YZCHs4fd3BMUuT1TW7U2RgrrBmu6PmMGpRx5RD");
+declare_id!("Ad1y5v7dsQyiJF1cztiy9nUS2skKGC3apf8ngcacnQS8");
 
 /// constant
 pub mod constant;
@@ -81,6 +81,25 @@ pub mod nft_auction {
         )
     }
 
+    pub fn create_auction_v3<'info>(
+        ctx: Context<'_, '_, '_, 'info, CreateAuctionV3<'info>>,
+        start_price: u64,
+        start_time: i64,
+        end_time: i64,
+        destination: Option<Pubkey>,
+        burn_proceeds: bool,
+        tag: u64,
+        tick_option: u8,
+        tick_amount: u64,
+        root: [u8; 32],
+        data_hash: [u8; 32],
+        creator_hash: [u8; 32],
+        nonce: u64,
+        index: u32,
+    ) -> Result<()> {
+        process_create_auction_v3::handler(ctx, start_price, start_time, end_time, destination, burn_proceeds, tag, tick_option, tick_amount, root, data_hash, creator_hash, nonce, index)
+    }
+
     pub fn init_auction_vault(ctx: Context<InitAuctionVault>) -> Result<()> {
         process_init_auction_vault::handler(ctx)
     }
@@ -103,6 +122,28 @@ pub mod nft_auction {
 
     pub fn cancel_auction_v2_2022(ctx: Context<CancelAuctionV22022>) -> Result<()> {
         process_cancel_auction_v2_2022::handler(ctx)
+    }
+
+    pub fn cancel_auction_v3<'info>(
+        ctx: Context<'_, '_, '_, 'info, CancelAuctionV3<'info>>,
+        root: [u8; 32],
+        data_hash: [u8; 32],
+        creator_hash: [u8; 32],
+        nonce: u64,
+        index: u32,
+    ) -> Result<()> {
+        process_cancel_auction_v3::handler(ctx, root, data_hash, creator_hash, nonce, index)
+    }
+
+    pub fn cancel_auction_v3_2022<'info>(
+        ctx: Context<'_, '_, '_, 'info, CancelAuctionV32022<'info>>,
+        root: [u8; 32],
+        data_hash: [u8; 32],
+        creator_hash: [u8; 32],
+        nonce: u64,
+        index: u32,
+    ) -> Result<()> {
+        process_cancel_auction_v3_2022::handler(ctx, root, data_hash, creator_hash, nonce, index)
     }
 
     // user
@@ -129,36 +170,26 @@ pub mod nft_auction {
     pub fn claim_nft_v2_2022(ctx: Context<ClaimNftV22022>) -> Result<()> {
         process_claim_nft_v2_2022::handler(ctx)
     }
+
+    pub fn claim_nft_v3<'info>(
+        ctx: Context<'_, '_, '_, 'info, ClaimNftV3<'info>>,
+        root: [u8; 32],
+        data_hash: [u8; 32],
+        creator_hash: [u8; 32],
+        nonce: u64,
+        index: u32,
+    ) -> Result<()> {
+        process_claim_nft_v3::handler(ctx, root, data_hash, creator_hash, nonce, index)
+    }
+
+    pub fn claim_nft_v3_2022<'info>(
+        ctx: Context<'_, '_, '_, 'info, ClaimNftV32022<'info>>,
+        root: [u8; 32],
+        data_hash: [u8; 32],
+        creator_hash: [u8; 32],
+        nonce: u64,
+        index: u32,
+    ) -> Result<()> {
+        process_claim_nft_v3_2022::handler(ctx, root, data_hash, creator_hash, nonce, index)
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

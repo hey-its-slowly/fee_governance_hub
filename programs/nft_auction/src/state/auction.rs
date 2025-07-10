@@ -16,7 +16,7 @@ pub struct Auction {
     pub end_time: i64,                 // Auction end timestamp
     pub destination: Pubkey,           // Where auction proceeds go
     pub burn_proceeds: bool,           // Whether to burn proceeds
-    pub prize_type: u8,                 // Prize type for future use - 1: NFT, 2: CORE
+    pub prize_type: u8,                 // Prize type for future use - 1: NFT, 2: CORE, 3: CNFT
     pub num_bids: u64,                 // Number of bids
     pub collection: Pubkey,    // Collection of the NFT
     pub tick_option: u8,               // Tick option
