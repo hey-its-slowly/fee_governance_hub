@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 
 #[error_code]
-pub enum AuctionCode {
+pub enum ContractError {
     #[msg("Invalid authority")]
     InvalidAuthority,
     #[msg("Auction start time must be in the future")]
