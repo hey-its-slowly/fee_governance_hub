@@ -20,12 +20,12 @@ pub mod nft_auction {
     use super::*;
 
     // admin
-    pub fn add_creator(ctx: Context<AddCreator>, fee_type: u8, fee_amount: u64) -> Result<()> {
-        process_add_creator::handler(ctx, fee_type, fee_amount)
+    pub fn add_creator(ctx: Context<AddCreator>, fee_type: u8, fee_amount: u64, backend_authority: Option<Pubkey>) -> Result<()> {
+        process_add_creator::handler(ctx, fee_type, fee_amount, backend_authority)
     }
 
-    pub fn edit_creator(ctx: Context<EditCreator>, fee_type: u8, fee_amount: u64) -> Result<()> {
-        process_edit_creator::handler(ctx, fee_type, fee_amount)
+    pub fn edit_creator(ctx: Context<EditCreator>, fee_type: u8, fee_amount: u64, backend_authority: Option<Pubkey>) -> Result<()> {
+        process_edit_creator::handler(ctx, fee_type, fee_amount, backend_authority)
     }
 
     pub fn remove_creator(ctx: Context<RemoveCreator>) -> Result<()> {

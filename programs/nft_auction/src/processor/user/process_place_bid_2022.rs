@@ -11,10 +11,8 @@ pub struct PlaceBid2022<'info> {
     #[account(mut)]
     pub bidder: Signer<'info>,
 
-    #[account(mut,
-      constraint = is_super_admin(backend_authority.key) @ ContractError::InvalidAuthority
-    )]
-    pub backend_authority: Signer<'info>,
+    /// CHECK: Optional backend authority - validated in handler based on creator settings
+    pub backend_authority: Option<Signer<'info>>,
 
     #[account(
         mut,
@@ -22,6 +20,12 @@ pub struct PlaceBid2022<'info> {
         bump,
     )]
     pub auction: Account<'info, Auction>,
+
+    #[account(
+        seeds = [b"creator", auction.creator.as_ref()],
+        bump,
+    )]
+    pub creator_account: Account<'info, Creator>,
 
     #[account(
         mut,
@@ -52,6 +56,23 @@ pub struct PlaceBid2022<'info> {
 }
 
 pub fn handler(ctx: Context<PlaceBid2022>, bid_amount: u64) -> Result<()> {
+    // Validate backend authority based on creator settings
+    if ctx.accounts.creator_account.requires_backend_authority() {
+        require!(
+            ctx.accounts.backend_authority.is_some(),
+            ContractError::InvalidAuthority
+        );
+        let backend_auth = ctx.accounts.backend_authority.as_ref().unwrap();
+        require!(
+            backend_auth.key() == ctx.accounts.creator_account.backend_authority,
+            ContractError::InvalidAuthority
+        );
+        require!(
+            is_super_admin(&backend_auth.key()),
+            ContractError::InvalidAuthority
+        );
+    }
+
     // Validate auction timing
     let clock = Clock::get()?;
     require!(

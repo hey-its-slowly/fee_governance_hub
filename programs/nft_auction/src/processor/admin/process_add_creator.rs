@@ -28,13 +28,15 @@ pub struct AddCreator<'info> {
   pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<AddCreator>, fee_type: u8, fee_amount: u64) -> Result<()> {
+pub fn handler(ctx: Context<AddCreator>, fee_type: u8, fee_amount: u64, backend_authority: Option<Pubkey>) -> Result<()> {
     ctx.accounts.creator.bump = ctx.bumps.creator;
     ctx.accounts.creator.wallet = ctx.accounts.creator_wallet.key();
     ctx.accounts.creator.created_at = Clock::get()?.unix_timestamp as u64;
     ctx.accounts.creator.fee_type = fee_type;
     ctx.accounts.creator.fee_amount = fee_amount;
     ctx.accounts.creator.fee_wallet = ctx.accounts.fee_wallet.key();
+    // Set backend_authority to system program if not provided (no backend authority required)
+    ctx.accounts.creator.backend_authority = backend_authority.unwrap_or(anchor_lang::system_program::ID);
 
     Ok(())
 }
