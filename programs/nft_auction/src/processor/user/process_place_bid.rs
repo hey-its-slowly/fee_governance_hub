@@ -1,13 +1,18 @@
 use {
     anchor_lang::prelude::*,
     anchor_spl::token::{Token, Mint, TokenAccount, Transfer},
-    crate::{error::ContractError, state::*, constant::*},
+    crate::{error::ContractError, state::*, constant::*, utils::*},
 };
 
 #[derive(Accounts)]
 pub struct PlaceBid<'info> {
     #[account(mut)]
     pub bidder: Signer<'info>,
+
+    #[account(mut,
+      constraint = is_super_admin(backend_authority.key) @ ContractError::InvalidAuthority
+    )]
+    pub backend_authority: Signer<'info>,
 
     #[account(
         mut,

@@ -3,13 +3,18 @@ use {
     anchor_spl::token_interface::{
         self, Token2022, Mint as Token2022Mint, TokenAccount as Token2022TokenAccount, TransferChecked,
     },
-    crate::{error::ContractError, state::*, constant::*},
+    crate::{error::ContractError, state::*, constant::*, utils::*},
 };
 
 #[derive(Accounts)]
 pub struct PlaceBid2022<'info> {
     #[account(mut)]
     pub bidder: Signer<'info>,
+
+    #[account(mut,
+      constraint = is_super_admin(backend_authority.key) @ ContractError::InvalidAuthority
+    )]
+    pub backend_authority: Signer<'info>,
 
     #[account(
         mut,
