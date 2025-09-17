@@ -33,10 +33,7 @@ pub fn handler(ctx: Context<EditCreator>, fee_type: u8, fee_amount: u64, backend
   creator.fee_type = fee_type;
   creator.fee_amount = fee_amount;
   creator.fee_wallet = ctx.accounts.fee_wallet.key();
-  // Update backend_authority if provided, otherwise keep existing value
-  if let Some(auth) = backend_authority {
-    creator.backend_authority = auth;
-  }
+  creator.backend_authority = backend_authority.unwrap_or(anchor_lang::system_program::ID);
 
   msg!("Updated creator: {} with fee_type: {}, fee_amount: {}, fee_wallet: {}, backend_authority: {}", 
        ctx.accounts.creator_wallet.key(), fee_type, fee_amount, ctx.accounts.fee_wallet.key(), creator.backend_authority);

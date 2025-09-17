@@ -1,7 +1,7 @@
 use {
     anchor_lang::prelude::*,
     anchor_spl::token::{Token, Mint, TokenAccount, Transfer},
-    crate::{error::ContractError, state::*, constant::*, utils::*},
+    crate::{error::ContractError, state::*, constant::*},
 };
 
 #[derive(Accounts)]
@@ -10,7 +10,7 @@ pub struct PlaceBid<'info> {
     pub bidder: Signer<'info>,
 
     /// CHECK: Optional backend authority - validated in handler based on creator settings
-    pub backend_authority: Option<Signer<'info>>,
+    pub backend_authority: Signer<'info>,
 
     #[account(
         mut,
@@ -64,16 +64,7 @@ pub fn handler(ctx: Context<PlaceBid>, bid_amount: u64) -> Result<()> {
     // Validate backend authority based on creator settings
     if ctx.accounts.creator_account.requires_backend_authority() {
         require!(
-            ctx.accounts.backend_authority.is_some(),
-            ContractError::InvalidAuthority
-        );
-        let backend_auth = ctx.accounts.backend_authority.as_ref().unwrap();
-        require!(
-            backend_auth.key() == ctx.accounts.creator_account.backend_authority,
-            ContractError::InvalidAuthority
-        );
-        require!(
-            is_super_admin(&backend_auth.key()),
+            ctx.accounts.backend_authority.key() == ctx.accounts.creator_account.backend_authority,
             ContractError::InvalidAuthority
         );
     }
